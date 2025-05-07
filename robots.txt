@@ -1,4 +1,2 @@
 User-agent: *
 Allow: /
-
-Sitemap: https://[GITHUB_USERNAME].github.io/web-serial-terminal/sitemap.xml 
