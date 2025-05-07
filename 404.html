@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="error-page">
+    <div class="error-container">
+        <h1>4<i class="fas fa-exclamation-circle"></i>4</h1>
+        <h2><i class="fas fa-terminal"></i> Command Not Found</h2>
+        <p>The terminal could not locate the page you're looking for.</p>
+        <div class="terminal-snippet">
+            <div class="prompt">user@webserial:~$</div>
+            <div class="command">find /page</div>
+            <div class="error">Error: Page not found in filesystem</div>
+            <div class="prompt">user@webserial:~$</div>
+            <div class="command">cd /</div>
+            <div class="output">Returning to home directory...</div>
+        </div>
+        <p><a href="/" class="button-link"><i class="fas fa-home"></i> Return to Home Terminal</a></p>
+    </div>
+
+    <script>
+        // Theme handling for 404 page
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        });
+    </script>
+</body>
+</html> 
