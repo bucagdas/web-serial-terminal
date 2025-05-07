@@ -86,6 +86,14 @@ You can use any of the following static hosting services:
 
 MIT
 
+## Author
+
+[sarusadgac](https://github.com/sarusadgac)
+
+## Repository
+
+This project is hosted on GitHub: [https://github.com/sarusadgac/SerialTerm](https://github.com/sarusadgac/SerialTerm)
+
 ## Contributors
 
 This project is open source and welcomes your contributions! 
