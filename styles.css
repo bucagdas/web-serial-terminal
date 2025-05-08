@@ -436,37 +436,78 @@ label input[type="checkbox"] {
 
 /* ===== TERMINAL STYLES ===== */
 .terminal-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-    margin-bottom: 20px;
     position: relative;
-    transition: all 0.3s ease;
+    background-color: var(--terminal-bg);
+    color: var(--terminal-text);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: var(--terminal-shadow);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 10px;
+    margin-bottom: 16px;
+    overflow-wrap: break-word;
+    height: 400px; /* Fixed height */
+    max-height: 70vh; /* Maximum height relative to viewport */
+    overflow-y: auto; /* Vertical scrollbar when needed */
+    resize: vertical; /* Allow vertical resizing */
+    min-height: 200px; /* Minimum height */
 }
 
-.terminal-container.minimized .terminal {
-    height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
+#terminal {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Terminal scrollbar styling */
+.terminal-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.terminal-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.terminal-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.terminal-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Adjust dark theme scrollbar */
+[data-theme="dark"] .terminal-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .terminal-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.terminal-container.minimized {
+    height: 40px !important; /* Just show the header */
     overflow: hidden;
+    resize: none;
 }
 
-.terminal-container.minimized .input-area {
+.terminal-container.minimized #terminal {
     display: none;
 }
 
 .terminal-container.maximized {
+    height: calc(100vh - 160px) !important;
+    max-height: none;
+    width: 100%;
     position: fixed;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-    bottom: 20px;
+    top: 80px;
+    left: 0;
     z-index: 1000;
-    margin: 0;
-    height: calc(100vh - 40px);
+    border-radius: 0;
+    resize: none;
 }
 
 .terminal-container.maximized .terminal {
@@ -474,26 +515,26 @@ label input[type="checkbox"] {
 }
 
 .terminal-header {
-    background-color: rgba(30, 41, 59, 0.9);
-    padding: 10px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+    padding: 0 10px;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    user-select: none;
 }
 
 .terminal-title {
-    color: white;
-    font-size: 0.9rem;
     font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
 .terminal-controls {
     display: flex;
-    gap: 8px;
+    gap: 4px;
 }
 
 .terminal-control {
@@ -813,4 +854,46 @@ body.error-page {
     .terminal {
         height: 350px;
     }
+}
+
+/* Terminal control buttons */
+.control-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    margin-left: 5px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.control-btn.active {
+    color: var(--primary-color);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Auto-scroll toggle */
+.auto-scroll-toggle.disabled {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Add a subtle indicator when auto-scroll is off */
+.auto-scroll-toggle.disabled::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 16px;
+    background-color: rgba(255, 0, 0, 0.7);
+    transform: rotate(45deg);
+    top: 4px;
 } 

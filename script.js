@@ -21,6 +21,7 @@ const themeToggle = document.getElementById('themeToggle');
 const controlClose = document.querySelector('.control-close');
 const controlMinimize = document.querySelector('.control-minimize');
 const controlMaximize = document.querySelector('.control-maximize');
+const autoScrollToggle = document.getElementById('autoScrollToggle');
 const terminalContainer = document.querySelector('.terminal-container');
 const settingsToggle = document.getElementById('settingsToggle');
 const commandsToggle = document.getElementById('commandsToggle');
@@ -47,6 +48,7 @@ let isTerminalMaximized = false;
 let isTerminalMinimized = false;
 let isSettingsPanelHidden = localStorage.getItem('settingsPanelHidden') === 'true';
 let isCommandsPanelHidden = localStorage.getItem('commandsPanelHidden') === 'true';
+let autoScroll = true; // Auto-scroll enabled by default
 
 // Control sequence mappings
 const controlSequences = {
@@ -96,6 +98,39 @@ panelToggles.forEach(toggle => {
     });
 });
 
+// Auto-scroll toggle
+autoScrollToggle.addEventListener('click', () => {
+    autoScroll = !autoScroll;
+    autoScrollToggle.classList.toggle('disabled', !autoScroll);
+    
+    if (autoScroll) {
+        // If re-enabling auto-scroll, scroll to bottom immediately
+        scrollToBottom();
+    }
+    
+    // Save preference to localStorage
+    localStorage.setItem('autoScroll', autoScroll);
+});
+
+// Add event listener for manual scrolling
+terminalContainer.addEventListener('scroll', function() {
+    // If user has scrolled up more than 30px from bottom, disable auto-scroll
+    if (terminalContainer.scrollHeight - terminalContainer.scrollTop > terminalContainer.clientHeight + 30) {
+        autoScroll = false;
+    } 
+    // If user has scrolled to near bottom (within 10px), re-enable auto-scroll
+    else if (terminalContainer.scrollHeight - terminalContainer.scrollTop <= terminalContainer.clientHeight + 10) {
+        autoScroll = true;
+    }
+});
+
+// Function to scroll to bottom if auto-scroll is enabled
+function scrollToBottom() {
+    if (autoScroll) {
+        terminalContainer.scrollTop = terminalContainer.scrollHeight;
+    }
+}
+
 // Function to toggle panel visibility
 function togglePanel(panelId) {
     const panel = document.getElementById(panelId);
@@ -128,12 +163,10 @@ controlMinimize.addEventListener('click', () => {
     
     if (!isTerminalMinimized) {
         // Minimize
-        terminal.style.height = '0';
         terminalContainer.classList.add('minimized');
         isTerminalMinimized = true;
     } else {
         // Restore
-        terminal.style.height = '';
         terminalContainer.classList.remove('minimized');
         isTerminalMinimized = false;
     }
@@ -144,14 +177,10 @@ controlMaximize.addEventListener('click', toggleMaximize);
 function toggleMaximize() {
     if (!isTerminalMaximized) {
         // Maximize
-        document.querySelector('.connection-panel').style.display = 'none';
-        document.querySelector('.commands-panel').style.display = 'none';
         terminalContainer.classList.add('maximized');
         isTerminalMaximized = true;
     } else {
         // Restore
-        document.querySelector('.connection-panel').style.display = '';
-        document.querySelector('.commands-panel').style.display = '';
         terminalContainer.classList.remove('maximized');
         isTerminalMaximized = false;
     }
@@ -173,6 +202,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isCommandsPanelHidden) {
         togglePanel('commandsPanel');
         commandsToggle.classList.add('active');
+    }
+    
+    // Apply saved auto-scroll state
+    const savedAutoScroll = localStorage.getItem('autoScroll');
+    if (savedAutoScroll !== null) {
+        autoScroll = savedAutoScroll !== 'false';
+        autoScrollToggle.classList.toggle('disabled', !autoScroll);
     }
     
     // Welcome message
@@ -432,7 +468,7 @@ function updateConnectionStatus() {
 
 function logToTerminal(text) {
     terminal.innerHTML += text;
-    terminal.scrollTop = terminal.scrollHeight;
+    scrollToBottom();
 }
 
 function clearTerminal() {

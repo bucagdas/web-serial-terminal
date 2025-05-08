@@ -193,9 +193,18 @@
                     <i class="fas fa-terminal"></i> Serial Connection
                 </div>
                 <div class="terminal-controls">
-                    <div class="terminal-control control-close"></div>
-                    <div class="terminal-control control-minimize"></div>
-                    <div class="terminal-control control-maximize"></div>
+                    <button class="control-btn control-close" title="Clear Terminal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <button class="control-btn control-minimize" title="Minimize Terminal">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button class="control-btn control-maximize" title="Maximize Terminal">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button class="control-btn auto-scroll-toggle" id="autoScrollToggle" title="Toggle Auto-scroll">
+                        <i class="fas fa-angle-double-down"></i>
+                    </button>
                 </div>
             </div>
             <div id="terminal" class="terminal"></div>
