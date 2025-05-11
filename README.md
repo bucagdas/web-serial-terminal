@@ -2,6 +2,8 @@
 
 A modern, user-friendly, and customizable web-based terminal interface that allows you to communicate with devices using the Web Serial API.
 
+**[🌐 Live Demo: https://webserialterminal.com/](https://webserialterminal.com/)**
+
 ## Features
 
 - 📡 Connect to serial port devices directly from your browser
@@ -11,6 +13,7 @@ A modern, user-friendly, and customizable web-based terminal interface that allo
 - 📊 Hideable panels for a clean and focused working environment
 - ⌨️ Send control sequences such as Ctrl+C, Ctrl+Z
 - 🔄 Local echo and CR/LF settings
+- 🖥️ Two terminal modes: Modern (with separate input field) and Traditional (classic terminal experience)
 
 ## Requirements
 
@@ -19,6 +22,24 @@ A modern, user-friendly, and customizable web-based terminal interface that allo
   - [Microsoft Edge](https://www.microsoft.com/edge/download) (version 89+)
   - Other Chromium-based browsers
 - The Web Serial API only works over **HTTPS** or **localhost** (for security reasons)
+
+## Terminal Modes
+
+The application offers two different terminal interface modes to accommodate different user preferences:
+
+### Modern Mode (Default)
+- Uses a separate input field and send button
+- Easier for touch devices and mobile users
+- More familiar for web application users
+- Better control over input formatting
+
+### Traditional Mode
+- Classic terminal experience similar to desktop terminals like PuTTY or Linux Terminal
+- Type directly in the terminal window
+- Blinking cursor and command prompt
+- Familiar for users experienced with command-line interfaces
+
+You can switch between these modes by clicking the keyboard icon (🖮) in the terminal header. Your preferred mode is saved and will be used on your next visit.
 
 ## Serverless Usage
 
@@ -72,10 +93,30 @@ You can use any of the following static hosting services:
 
 ## How to Use
 
+You can try the application immediately through our live demo at **[https://webserialterminal.com/](https://webserialterminal.com/)** or follow these steps to run it locally:
+
 1. Open the page (via HTTPS or localhost)
 2. Click the "Connect" button
 3. Select the serial port device you want to connect to
-4. Enter and send your terminal commands
+4. Choose your preferred terminal mode (Modern or Traditional) by clicking the keyboard icon in the terminal header
+5. Enter and send your terminal commands:
+   - In Modern mode: Type in the input field and click the send button or press Enter
+   - In Traditional mode: Click anywhere in the terminal and type directly, press Enter to send
+
+## Terminal Features
+
+### Modern Terminal Mode
+- Type commands in the dedicated input field
+- Press Enter or click the Send button to transmit
+- Terminal output is displayed separately from input
+- Easier to edit long commands with standard text input features
+
+### Traditional Terminal Mode
+- Click anywhere in the terminal to start typing
+- Commands appear right after the prompt
+- Press Enter to transmit the command
+- Experience similar to a native terminal with blinking cursor
+- Better for users familiar with command-line interfaces
 
 ## Hiding/Showing Panels
 
@@ -92,7 +133,9 @@ MIT
 
 ## Repository
 
-This project is hosted on GitHub: [https://github.com/sarusadgac/SerialTerm](https://github.com/sarusadgac/SerialTerm)
+This project is hosted on GitHub: [https://github.com/sarusadgac/web-serial-terminal](https://github.com/sarusadgac/web-serial-terminal)
+
+Live Demo: [https://webserialterminal.com/](https://webserialterminal.com/)
 
 ## Contributors
 
