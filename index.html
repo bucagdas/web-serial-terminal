@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<!--
+    Web Serial Terminal
+    Copyright (c) 2025 sarusadgac
+   https://github.com/sarusadgac/web-serial-terminal
+    
+    License: MIT
+    
+    This code is protected by copyright law.
+    Unauthorized usage, copying, modification or distribution 
+    outside the license terms is prohibited.
+-->
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
@@ -6,10 +17,22 @@
     <title>Web Serial Terminal</title>
     <meta name="description" content="Terminal Application working with Web Serial API">
     <meta name="author" content="sarusadgac">
+    <meta name="copyright" content="Copyright (c) 2025 sarusadgac. All rights reserved.">
+    <meta name="robots" content="noindex, nofollow">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#6366f1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Favicon for browsers -->
+    <link rel="icon" type="image/png" href="icons/icon-192x192.png">
+    <link rel="shortcut icon" type="image/png" href="icons/icon-192x192.png">
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192x192.png">
+    <!-- Windows Tile Icon -->
+    <meta name="msapplication-TileImage" content="icons/icon-144x144.png">
+    <meta name="msapplication-TileColor" content="#6366f1">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -121,6 +144,31 @@
                         <i class="fas fa-eraser"></i> Clear
                     </button>
                 </div>
+                
+                <div class="connection-controls">
+                    <div class="settings-group">
+                        <label for="terminalHeight">Terminal Height</label>
+                        <select id="terminalHeight">
+                            <option value="300">300px</option>
+                            <option value="400" selected>400px</option>
+                            <option value="500">500px</option>
+                            <option value="600">600px</option>
+                            <option value="700">700px</option>
+                        </select>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <label for="terminalFontSize">Font Size</label>
+                        <select id="terminalFontSize">
+                            <option value="10">10px</option>
+                            <option value="12">12px</option>
+                            <option value="14" selected>14px</option>
+                            <option value="16">16px</option>
+                            <option value="18">18px</option>
+                            <option value="20">20px</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -193,6 +241,18 @@
                     <i class="fas fa-terminal"></i> Serial Connection
                 </div>
                 <div class="terminal-controls">
+                    <button class="control-btn" id="statsToggle" title="Show terminal statistics">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                    <button class="control-btn" id="exportToggle" title="Export terminal content">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="control-btn" id="searchToggle" title="Search in terminal">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="control-btn" id="filterToggle" title="Filter terminal output">
+                        <i class="fas fa-filter"></i>
+                    </button>
                     <button class="control-btn control-close" title="Clear Terminal">
                         <i class="fas fa-times"></i>
                     </button>
@@ -207,7 +267,109 @@
                     </button>
                 </div>
             </div>
-            <div id="terminal" class="terminal"></div>
+            
+            <div class="terminal-panels">
+                <!-- Terminal search panel -->
+                <div id="searchPanel" class="terminal-utility-panel hidden">
+                    <div class="utility-panel-content">
+                        <div class="search-controls">
+                            <input type="text" id="searchInput" placeholder="Search in terminal...">
+                            <button id="searchPrev" class="utility-btn" title="Previous match">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button id="searchNext" class="utility-btn" title="Next match">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <span id="searchInfo" class="search-info">0 matches</span>
+                        </div>
+                        <button id="closeSearch" class="utility-close-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Terminal filter panel -->
+                <div id="filterPanel" class="terminal-utility-panel hidden">
+                    <div class="utility-panel-content">
+                        <div class="filter-controls">
+                            <div class="filter-option">
+                                <input type="checkbox" id="filterErrors" class="filter-checkbox">
+                                <label for="filterErrors">Show errors only</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="filterCommands" class="filter-checkbox">
+                                <label for="filterCommands">Show commands only</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="text" id="customFilter" placeholder="Custom filter (regex)">
+                            </div>
+                        </div>
+                        <button id="applyFilter" class="utility-btn" title="Apply filter">
+                            <i class="fas fa-check"></i> Apply
+                        </button>
+                        <button id="resetFilter" class="utility-btn" title="Reset filter">
+                            <i class="fas fa-undo"></i> Reset
+                        </button>
+                        <button id="closeFilter" class="utility-close-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Terminal export panel -->
+                <div id="exportPanel" class="terminal-utility-panel hidden">
+                    <div class="utility-panel-content">
+                        <div class="export-controls">
+                            <span class="export-label">Export terminal content as:</span>
+                            <button id="exportTxt" class="utility-btn" title="Export as text file">
+                                <i class="fas fa-file-alt"></i> Text File (.txt)
+                            </button>
+                        </div>
+                        <button id="closeExport" class="utility-close-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Terminal statistics panel -->
+                <div id="statsPanel" class="terminal-utility-panel hidden">
+                    <div class="utility-panel-content">
+                        <div class="stats-controls">
+                            <div class="stats-item">
+                                <span class="stats-label">Connection Time:</span>
+                                <span id="connectionTime" class="stats-value">00:00:00</span>
+                            </div>
+                            <div class="stats-item">
+                                <span class="stats-label">Bytes Sent:</span>
+                                <span id="bytesSent" class="stats-value">0</span>
+                            </div>
+                            <div class="stats-item">
+                                <span class="stats-label">Bytes Received:</span>
+                                <span id="bytesReceived" class="stats-value">0</span>
+                            </div>
+                            <div class="stats-item">
+                                <span class="stats-label">Commands Sent:</span>
+                                <span id="commandsSent" class="stats-value">0</span>
+                            </div>
+                            <div class="stats-item">
+                                <span class="stats-label">Transfer Rate:</span>
+                                <span id="transferRate" class="stats-value">0 B/s</span>
+                            </div>
+                        </div>
+                        <button id="resetStats" class="utility-btn" title="Reset statistics">
+                            <i class="fas fa-redo-alt"></i> Reset
+                        </button>
+                        <button id="closeStats" class="utility-close-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="terminal-content-area">
+                <div id="terminal" class="terminal"></div>
+            </div>
+            
             <div class="input-area">
                 <input type="text" id="input" placeholder="Type command here...">
                 <button id="sendButton">
@@ -217,7 +379,7 @@
         </div>
         
         <footer>
-            <p>Web Serial Terminal <span>&copy; 2025</span> | <i class="fas fa-microchip"></i> Uses Web Serial API | Compatible with <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">Chrome</a> and <a href="https://www.microsoft.com/edge/download" target="_blank" rel="noopener noreferrer">Edge</a> browsers | By <a href="https://github.com/sarusadgac" target="_blank" rel="noopener noreferrer">sarusadgac</a> | <a href="https://github.com/sarusadgac/SerialTerm" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a></p>
+            <p>Web Serial Terminal <span>&copy; 2025</span> | <i class="fas fa-microchip"></i> Uses Web Serial API | Compatible with <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">Chrome</a> and <a href="https://www.microsoft.com/edge/download" target="_blank" rel="noopener noreferrer">Edge</a> browsers | By <a href="https://github.com/sarusadgac" target="_blank" rel="noopener noreferrer">sarusadgac</a> | <a href="https://github.com/sarusadgac/web-serial-terminal" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a></p>
         </footer>
     </div>
     

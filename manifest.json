@@ -1,6 +1,6 @@
 {
   "name": "Web Serial Terminal",
-  "short_name": "SerialTerm",
+  "short_name": "Web Serial Terminal",
   "description": "Terminal Application working with Web Serial API",
   "author": "sarusadgac",
   "start_url": "./index.html",

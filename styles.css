@@ -1,6 +1,19 @@
 /* 
  * Web Serial Terminal - Styles
  * --------------------------
+ * Copyright (c) 2025 sarusadgac
+ *https://github.com/sarusadgac/web-serial-terminal
+ * 
+ * License: MIT
+ * 
+ * This code is protected by copyright law.
+ * Unauthorized usage, copying, modification or distribution 
+ * outside the license terms is prohibited.
+ * 
+ * Bu kod telif hakkı yasası ile korunmaktadır.
+ * Lisans şartları dışında kullanımı, kopyalanması,
+ * değiştirilmesi veya dağıtılması yasaktır.
+ * --------------------------
  * Styles designed for a modern, minimal and user-friendly 
  * terminal interface.
  */
@@ -437,6 +450,8 @@ label input[type="checkbox"] {
 /* ===== TERMINAL STYLES ===== */
 .terminal-container {
     position: relative;
+    display: flex;
+    flex-direction: column;
     background-color: var(--terminal-bg);
     color: var(--terminal-text);
     border-radius: 8px;
@@ -445,75 +460,83 @@ label input[type="checkbox"] {
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
     line-height: 1.5;
-    padding: 10px;
     margin-bottom: 16px;
-    overflow-wrap: break-word;
+    overflow: hidden; /* Prevent any overflow outside the container */
     height: 400px; /* Fixed height */
     max-height: 70vh; /* Maximum height relative to viewport */
-    overflow-y: auto; /* Vertical scrollbar when needed */
-    resize: vertical; /* Allow vertical resizing */
     min-height: 200px; /* Minimum height */
+    resize: vertical; /* Allow vertical resizing */
+}
+
+.terminal-content-area {
+    flex: 1;
+    overflow-y: auto; /* Only this area should scroll */
+    position: relative;
 }
 
 #terminal {
+    padding: 10px;
     white-space: pre-wrap;
     word-break: break-word;
+    min-height: 100%;
 }
 
 /* Terminal scrollbar styling */
-.terminal-container::-webkit-scrollbar {
+.terminal-content-area::-webkit-scrollbar {
     width: 8px;
 }
 
-.terminal-container::-webkit-scrollbar-track {
+.terminal-content-area::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.1);
     border-radius: 4px;
 }
 
-.terminal-container::-webkit-scrollbar-thumb {
+.terminal-content-area::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.3);
     border-radius: 4px;
 }
 
-.terminal-container::-webkit-scrollbar-thumb:hover {
+.terminal-content-area::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.4);
 }
 
 /* Adjust dark theme scrollbar */
-[data-theme="dark"] .terminal-container::-webkit-scrollbar-thumb {
+[data-theme="dark"] .terminal-content-area::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
 }
 
-[data-theme="dark"] .terminal-container::-webkit-scrollbar-thumb:hover {
+[data-theme="dark"] .terminal-content-area::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
 }
 
+/* Terminal container states */
 .terminal-container.minimized {
     height: 40px !important; /* Just show the header */
     overflow: hidden;
     resize: none;
 }
 
-.terminal-container.minimized #terminal {
+.terminal-container.minimized .terminal-content-area,
+.terminal-container.minimized .input-area,
+.terminal-container.minimized .terminal-panels {
     display: none;
 }
 
 .terminal-container.maximized {
-    height: calc(100vh - 160px) !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100vh !important;
     max-height: none;
     width: 100%;
-    position: fixed;
-    top: 80px;
-    left: 0;
     z-index: 1000;
     border-radius: 0;
     resize: none;
 }
 
-.terminal-container.maximized .terminal {
-    height: calc(100% - 100px);
-}
-
+/* Terminal header */
 .terminal-header {
     display: flex;
     justify-content: space-between;
@@ -526,6 +549,42 @@ label input[type="checkbox"] {
     font-size: 12px;
     color: rgba(255, 255, 255, 0.7);
     user-select: none;
+    z-index: 10;
+}
+
+/* Terminal panels container */
+.terminal-panels {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Terminal utility panels */
+.terminal-utility-panel {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    max-height: 50px;
+}
+
+.terminal-utility-panel.hidden {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+/* Input area */
+.input-area {
+    background-color: var(--terminal-bg);
+    display: flex;
+    gap: 10px;
+    padding: 10px 16px;
+    border-top: 1px solid rgba(51, 65, 85, 0.5);
 }
 
 .terminal-title {
@@ -585,14 +644,6 @@ label input[type="checkbox"] {
 
 .terminal .error {
     color: var(--terminal-error);
-}
-
-.input-area {
-    background-color: var(--terminal-bg);
-    display: flex;
-    gap: 10px;
-    padding: 10px 16px;
-    border-top: 1px solid rgba(51, 65, 85, 0.5);
 }
 
 .input-area input {
@@ -896,4 +947,199 @@ body.error-page {
     background-color: rgba(255, 0, 0, 0.7);
     transform: rotate(45deg);
     top: 4px;
+}
+
+/* ===== TERMINAL UTILITY PANELS ===== */
+.terminal-utility-panel {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    max-height: 50px;
+}
+
+.terminal-utility-panel.hidden {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.utility-panel-content {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Search panel styles */
+.search-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+#searchInput {
+    flex: 1;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--terminal-text);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+}
+
+#searchInput:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.search-info {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    min-width: 80px;
+}
+
+/* Filter panel styles */
+.filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--terminal-text);
+    font-size: 12px;
+}
+
+.filter-checkbox {
+    accent-color: var(--primary-color);
+    width: 14px;
+    height: 14px;
+}
+
+#customFilter {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--terminal-text);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    width: 200px;
+}
+
+#customFilter:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+/* Utility buttons */
+.utility-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--terminal-text);
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.utility-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.utility-btn i {
+    font-size: 12px;
+}
+
+.utility-close-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.utility-close-btn:hover {
+    color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Search highlighting */
+.search-highlight {
+    background-color: rgba(244, 208, 63, 0.3);
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.search-highlight.active {
+    background-color: rgba(255, 164, 0, 0.6);
+    color: #000;
+}
+
+/* Filtered content */
+.filtered-out {
+    display: none;
+}
+
+/* Export panel styles */
+.export-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+.export-label {
+    font-size: 12px;
+    color: var(--terminal-text);
+}
+
+/* Statistics panel styles */
+.stats-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.stats-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 150px;
+}
+
+.stats-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.stats-value {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--terminal-text);
+    font-family: 'JetBrains Mono', monospace;
 } 
