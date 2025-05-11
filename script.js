@@ -380,6 +380,9 @@ document.addEventListener('DOMContentLoaded', () => {
         modernInputArea.classList.add('hidden');
         terminalModeToggle.classList.add('traditional-active');
         terminalModeToggle.setAttribute('title', 'Switch to modern mode');
+        
+        // Update cursor position for traditional terminal
+        updateCursorPosition();
     }
     
     // Welcome message for both terminal types
@@ -1266,6 +1269,9 @@ function toggleTerminalMode() {
         
         // Set prompt
         updateTraditionalPrompt();
+        
+        // Update cursor position
+        updateCursorPosition();
     } else {
         // Switch to modern mode
         terminalContainer.classList.remove('traditional-mode');
@@ -1284,8 +1290,16 @@ traditionalTerminal.addEventListener('click', function() {
     terminalInputArea.focus();
 });
 
+// Variables to help with cursor positioning
+let lastInputLength = 0;
+
 // Handle input in traditional terminal
 terminalInputArea.addEventListener('keydown', function(event) {
+    // Don't do special handling for modified keys (like Ctrl+C etc)
+    if (event.ctrlKey || event.altKey || event.metaKey) {
+        return;
+    }
+
     // Handle Enter key to submit command
     if (event.key === 'Enter') {
         event.preventDefault();
@@ -1294,6 +1308,7 @@ terminalInputArea.addEventListener('keydown', function(event) {
         if (command) {
             // Clear input area
             terminalInputArea.textContent = '';
+            lastInputLength = 0;
             
             // Add command to terminal output
             const commandLine = document.createElement('div');
@@ -1307,6 +1322,38 @@ terminalInputArea.addEventListener('keydown', function(event) {
             terminalOutput.scrollTop = terminalOutput.scrollHeight;
         }
     }
+});
+
+// Monitor changes to input to synchronize cursor position
+terminalInputArea.addEventListener('input', updateCursorPosition);
+terminalInputArea.addEventListener('click', updateCursorPosition);
+terminalInputArea.addEventListener('keyup', updateCursorPosition);
+
+// Function to update cursor position
+function updateCursorPosition() {
+    // Check if cursor needs to be shown or hidden
+    if (document.activeElement === terminalInputArea) {
+        terminalCursor.style.display = 'inline-block';
+        
+        // Make sure cursor is positioned right after input area
+        terminalInputArea.insertAdjacentElement('afterend', terminalCursor);
+    } else {
+        // Hide cursor when input is not focused
+        terminalCursor.style.display = 'none';
+    }
+}
+
+// Update positioning on window resize
+window.addEventListener('resize', updateCursorPosition);
+
+// Make sure the cursor visibility matches focus state
+terminalInputArea.addEventListener('focus', function() {
+    terminalCursor.style.display = 'inline-block';
+    updateCursorPosition();
+});
+
+terminalInputArea.addEventListener('blur', function() {
+    terminalCursor.style.display = 'none';
 });
 
 // Function to process commands from traditional terminal

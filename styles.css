@@ -1166,13 +1166,16 @@ body.error-page {
 .traditional-terminal .terminal-input-line {
     display: flex;
     padding: 0 10px 10px 10px;
-    align-items: baseline;
+    align-items: center;
+    position: relative;
+    flex-wrap: nowrap;
 }
 
 .traditional-terminal .terminal-prompt {
     color: var(--terminal-prompt);
     font-weight: bold;
     margin-right: 8px;
+    white-space: nowrap;
 }
 
 .traditional-terminal .terminal-input-area {
@@ -1183,6 +1186,11 @@ body.error-page {
     white-space: pre-wrap;
     word-break: break-word;
     color: var(--terminal-command);
+    position: relative;
+    display: inline-block;
+    min-height: 18px; /* Ensure consistent height even when empty */
+    padding: 0;
+    margin: 0;
 }
 
 .traditional-terminal .terminal-cursor {
@@ -1191,8 +1199,9 @@ body.error-page {
     height: 16px;
     background-color: var(--terminal-text);
     vertical-align: middle;
-    margin-left: 2px;
     animation: cursor-blink 1s step-end infinite;
+    position: relative;
+    margin-left: 1px;
 }
 
 @keyframes cursor-blink {
