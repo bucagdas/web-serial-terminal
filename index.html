@@ -14,15 +14,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Serial Terminal</title>
-    <meta name="description" content="Terminal Application working with Web Serial API">
+    <title>Web Serial Terminal - Communicate with Serial Devices in Your Browser</title>
+    <meta name="description" content="A modern, customizable web-based terminal interface that lets you connect to and communicate with serial port devices directly from your browser. Supports both traditional and modern terminal modes.">
+    <meta name="keywords" content="web serial api, serial terminal, browser terminal, serial port, serial communication, arduino terminal, esp32 terminal, telnet alternative">
     <meta name="author" content="sarusadgac">
     <meta name="copyright" content="Copyright (c) 2025 sarusadgac. All rights reserved.">
-    <meta name="robots" content="noindex, nofollow">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://sarusadgac.github.io/web-serial-terminal/" />
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#6366f1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sarusadgac.github.io/web-serial-terminal/">
+    <meta property="og:title" content="Web Serial Terminal - Browser-Based Serial Device Communication">
+    <meta property="og:description" content="Connect to serial devices directly from your browser with this modern, feature-rich terminal interface">
+    <meta property="og:image" content="icons/icon-512x512.png">
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://sarusadgac.github.io/web-serial-terminal/">
+    <meta property="twitter:title" content="Web Serial Terminal">
+    <meta property="twitter:description" content="Connect to serial devices directly from your browser with this modern, feature-rich terminal interface">
+    <meta property="twitter:image" content="icons/icon-512x512.png">
     <!-- Favicon for browsers -->
     <link rel="icon" type="image/png" href="icons/icon-192x192.png">
     <link rel="shortcut icon" type="image/png" href="icons/icon-192x192.png">
@@ -38,6 +52,30 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Schema.org markup for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Web Serial Terminal",
+      "url": "https://sarusadgac.github.io/web-serial-terminal/",
+      "description": "A modern, customizable web-based terminal interface that lets you connect to and communicate with serial port devices directly from your browser.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "sarusadgac",
+        "url": "https://github.com/sarusadgac"
+      },
+      "keywords": "web serial api, serial terminal, browser terminal, serial port, serial communication",
+      "license": "https://opensource.org/licenses/MIT"
+    }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -241,6 +279,9 @@
                     <i class="fas fa-terminal"></i> Serial Connection
                 </div>
                 <div class="terminal-controls">
+                    <button class="control-btn" id="terminalModeToggle" title="Toggle terminal mode (Traditional/Modern)">
+                        <i class="fas fa-keyboard"></i>
+                    </button>
                     <button class="control-btn" id="statsToggle" title="Show terminal statistics">
                         <i class="fas fa-chart-bar"></i>
                     </button>
@@ -368,9 +409,17 @@
             
             <div class="terminal-content-area">
                 <div id="terminal" class="terminal"></div>
+                <div id="traditionalTerminal" class="terminal traditional-terminal hidden">
+                    <div class="terminal-output"></div>
+                    <div class="terminal-input-line">
+                        <span class="terminal-prompt"></span>
+                        <span class="terminal-input-area" contenteditable="true" spellcheck="false"></span>
+                        <span class="terminal-cursor"></span>
+                    </div>
+                </div>
             </div>
             
-            <div class="input-area">
+            <div class="input-area" id="modernInputArea">
                 <input type="text" id="input" placeholder="Type command here...">
                 <button id="sendButton">
                     <i class="fas fa-paper-plane"></i> Send

@@ -139,6 +139,14 @@ const transferRate = document.getElementById('transferRate');
 const resetStats = document.getElementById('resetStats');
 const closeStats = document.getElementById('closeStats');
 
+const terminalModeToggle = document.getElementById('terminalModeToggle');
+const traditionalTerminal = document.getElementById('traditionalTerminal');
+const terminalOutput = document.querySelector('.traditional-terminal .terminal-output');
+const terminalInputArea = document.querySelector('.traditional-terminal .terminal-input-area');
+const terminalPrompt = document.querySelector('.traditional-terminal .terminal-prompt');
+const terminalCursor = document.querySelector('.traditional-terminal .terminal-cursor');
+const modernInputArea = document.getElementById('modernInputArea');
+
 // Check if Web Serial API is supported
 if (!('serial' in navigator)) {
     serialNotSupported.style.display = 'block';
@@ -159,6 +167,7 @@ let isTerminalMinimized = false;
 let isSettingsPanelHidden = localStorage.getItem('settingsPanelHidden') === 'true';
 let isCommandsPanelHidden = localStorage.getItem('commandsPanelHidden') === 'true';
 let autoScroll = true; // Auto-scroll enabled by default
+let isTraditionalMode = localStorage.getItem('traditionalMode') === 'true';
 
 // Search functionality variables
 let searchMatches = [];
@@ -328,7 +337,7 @@ themeToggle.addEventListener('click', toggleTheme);
 terminalHeight.addEventListener('change', updateTerminalSize);
 terminalFontSize.addEventListener('change', updateTerminalSize);
 
-// Apply saved terminal preferences on page load
+// Apply saved terminal mode on page load
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme(currentTheme);
     
@@ -364,11 +373,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Apply terminal size settings
     updateTerminalSize();
     
-    // Welcome message
+    // Apply saved terminal mode preference
+    if (isTraditionalMode) {
+        // Apply traditional mode without animation
+        terminalContainer.classList.add('traditional-mode');
+        modernInputArea.classList.add('hidden');
+        terminalModeToggle.classList.add('traditional-active');
+        terminalModeToggle.setAttribute('title', 'Switch to modern mode');
+    }
+    
+    // Welcome message for both terminal types
     setTimeout(() => {
         logToTerminal('<span class="output">Welcome to Web Serial Terminal!</span>\n');
         logToTerminal('<span class="output">Connect to a serial port to begin.</span>\n');
         logToTerminal('<span class="prompt">user@webserial:~$</span> ');
+        
+        appendToTraditionalTerminal('<span class="output">Welcome to Web Serial Terminal!</span>');
+        appendToTraditionalTerminal('<span class="output">Connect to a serial port to begin.</span>');
+        updateTraditionalPrompt();
     }, 300);
 });
 
@@ -453,8 +475,12 @@ async function connect() {
         connectButton.innerHTML = '<i class="fas fa-plug"></i> Disconnect';
         input.focus();
 
+        // Update both terminals
         logToTerminal('<span class="output">Connected to serial port</span>\n');
         logToTerminal('<span class="prompt">serial@port:~$</span> ');
+        
+        appendToTraditionalTerminal('<span class="output">Connected to serial port</span>');
+        updateTraditionalPrompt();
 
         // Reset and start statistics tracking
         resetStatistics();
@@ -462,6 +488,7 @@ async function connect() {
     } catch (error) {
         console.error('Error connecting to serial port:', error);
         logToTerminal(`<span class="error">Error connecting: ${error.message}</span>\n`);
+        appendToTraditionalTerminal(`<span class="error">Error connecting: ${error.message}</span>`);
     }
 }
 
@@ -493,8 +520,13 @@ async function disconnect() {
     isConnected = false;
     updateConnectionStatus();
     connectButton.innerHTML = '<i class="fas fa-plug"></i> Connect';
+    
+    // Update both terminals
     logToTerminal('<span class="output">Disconnected from serial port</span>\n');
     logToTerminal('<span class="prompt">user@webserial:~$</span> ');
+    
+    appendToTraditionalTerminal('<span class="output">Disconnected from serial port</span>');
+    updateTraditionalPrompt();
 
     // Stop statistics tracking
     stopStatsTracking();
@@ -517,12 +549,17 @@ async function readLoop() {
                 stats.lastReceiveTime = new Date();
                 updateStatsDisplay();
                 
+                // Output to modern terminal
                 logToTerminal(`<span class="output">${formatOutputText(value)}</span>`);
+                
+                // Output to traditional terminal
+                appendToTraditionalTerminal(`<span class="output">${formatOutputText(value)}</span>`);
             }
         }
     } catch (error) {
         console.error('Error reading from serial port:', error);
         logToTerminal(`<span class="error">Error reading: ${error.message}</span>\n`);
+        appendToTraditionalTerminal(`<span class="error">Error reading: ${error.message}</span>`);
     }
 }
 
@@ -1204,4 +1241,129 @@ function formatBytes(bytes) {
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     
     return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
+}
+
+// Terminal mode toggle
+terminalModeToggle.addEventListener('click', toggleTerminalMode);
+
+// Function to toggle between traditional and modern terminal modes
+function toggleTerminalMode() {
+    isTraditionalMode = !isTraditionalMode;
+    
+    // Save preference to localStorage
+    localStorage.setItem('traditionalMode', isTraditionalMode);
+    
+    // Update UI
+    if (isTraditionalMode) {
+        // Switch to traditional mode
+        terminalContainer.classList.add('traditional-mode');
+        modernInputArea.classList.add('hidden');
+        terminalModeToggle.classList.add('traditional-active');
+        terminalModeToggle.setAttribute('title', 'Switch to modern mode');
+        
+        // Set focus to traditional terminal
+        traditionalTerminal.click();
+        
+        // Set prompt
+        updateTraditionalPrompt();
+    } else {
+        // Switch to modern mode
+        terminalContainer.classList.remove('traditional-mode');
+        modernInputArea.classList.remove('hidden');
+        terminalModeToggle.classList.remove('traditional-active');
+        terminalModeToggle.setAttribute('title', 'Switch to traditional mode');
+        
+        // Set focus to modern input
+        input.focus();
+    }
+}
+
+// Traditional terminal functionality
+traditionalTerminal.addEventListener('click', function() {
+    // Focus the contenteditable area when clicking anywhere in the terminal
+    terminalInputArea.focus();
+});
+
+// Handle input in traditional terminal
+terminalInputArea.addEventListener('keydown', function(event) {
+    // Handle Enter key to submit command
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        
+        const command = terminalInputArea.textContent.trim();
+        if (command) {
+            // Clear input area
+            terminalInputArea.textContent = '';
+            
+            // Add command to terminal output
+            const commandLine = document.createElement('div');
+            commandLine.innerHTML = `<span class="terminal-prompt">${terminalPrompt.textContent}</span><span class="command">${escapeHtml(command)}</span>`;
+            terminalOutput.appendChild(commandLine);
+            
+            // Process the command
+            processTraditionalCommand(command);
+            
+            // Scroll to bottom
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+    }
+});
+
+// Function to process commands from traditional terminal
+function processTraditionalCommand(command) {
+    if (isConnected) {
+        // Send data via serial
+        sendSerialData(command);
+    } else {
+        // Not connected, show error
+        appendToTraditionalTerminal(`<span class="error">Not connected to a serial port</span>`);
+        updateTraditionalPrompt();
+    }
+}
+
+// Function to send serial data from traditional terminal
+async function sendSerialData(text) {
+    try {
+        const writer = outputStream.getWriter();
+        
+        // Prepare the data string with appropriate line endings
+        let dataToSend = text;
+        if (addCRCheckbox.checked) dataToSend += '\r';
+        if (addLFCheckbox.checked) dataToSend += '\n';
+
+        // Update sent bytes statistics
+        stats.totalBytesSent += dataToSend.length;
+        stats.totalCommandsSent++;
+        updateStatsDisplay();
+
+        // Send the data
+        await writer.write(dataToSend);
+        
+        // Release the writer
+        writer.releaseLock();
+    } catch (error) {
+        console.error('Error sending data:', error);
+        appendToTraditionalTerminal(`<span class="error">Error sending data: ${error.message}</span>`);
+    }
+}
+
+// Append text to traditional terminal output
+function appendToTraditionalTerminal(html) {
+    const element = document.createElement('div');
+    element.innerHTML = html;
+    terminalOutput.appendChild(element);
+    
+    // Scroll to bottom if auto-scroll is enabled
+    if (autoScroll) {
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    }
+}
+
+// Update the prompt in traditional terminal
+function updateTraditionalPrompt() {
+    if (isConnected) {
+        terminalPrompt.textContent = 'serial@port:~$ ';
+    } else {
+        terminalPrompt.textContent = 'user@webserial:~$ ';
+    }
 } 
