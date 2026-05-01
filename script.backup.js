@@ -1,7 +1,7 @@
 /**
  * Web Serial Terminal
- * Copyright (c) 2025 sarusadgac
- *https://github.com/sarusadgac/web-serial-terminal
+ * Copyright (c) 2025 bucagdas
+ *https://github.com/bucagdas/web-serial-terminal
  * 
  * License: MIT
  * 
@@ -38,7 +38,7 @@
         watermark.style.pointerEvents = 'none';
         watermark.style.zIndex = '100';
         watermark.style.userSelect = 'none';
-        watermark.textContent = `#${instanceId.substring(0, 6)} - sarusadgac`;
+        watermark.textContent = `#${instanceId.substring(0, 6)} - bucagdas`;
         document.querySelector('.terminal-content-area').appendChild(watermark);
         
         // Warning on select all
@@ -56,7 +56,7 @@
         setInterval(() => {
             if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
                 if (!devtoolsDetected) {
-                    console.warn('Web Serial Terminal Copyright © 2025 sarusadgac');
+                    console.warn('Web Serial Terminal Copyright © 2026 bucagdas');
                     devtoolsDetected = true;
                 }
             } else {

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
     Web Serial Terminal
-    Copyright (c) 2025 sarusadgac
-   https://github.com/sarusadgac/web-serial-terminal
+    Copyright (c) 2026 bucagdas
+   https://github.com/bucagdas/web-serial-terminal
     
     License: MIT
     
@@ -17,23 +17,23 @@
     <title>Web Serial Terminal - Communicate with Serial Devices in Your Browser</title>
     <meta name="description" content="A modern, customizable web-based terminal interface that lets you connect to and communicate with serial port devices directly from your browser. Supports both traditional and modern terminal modes.">
     <meta name="keywords" content="web serial api, serial terminal, browser terminal, serial port, serial communication, arduino terminal, esp32 terminal, telnet alternative">
-    <meta name="author" content="sarusadgac">
-    <meta name="copyright" content="Copyright (c) 2025 sarusadgac. All rights reserved.">
+    <meta name="author" content="bucagdas">
+    <meta name="copyright" content="Copyright (c) 2026 bucagdas. All rights reserved.">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://sarusadgac.github.io/web-serial-terminal/" />
+    <link rel="canonical" href="https://bucagdas.github.io/web-serial-terminal/" />
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#6366f1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://sarusadgac.github.io/web-serial-terminal/">
+    <meta property="og:url" content="https://bucagdas.github.io/web-serial-terminal/">
     <meta property="og:title" content="Web Serial Terminal - Browser-Based Serial Device Communication">
     <meta property="og:description" content="Connect to serial devices directly from your browser with this modern, feature-rich terminal interface">
     <meta property="og:image" content="icons/icon-512x512.png">
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://sarusadgac.github.io/web-serial-terminal/">
+    <meta property="twitter:url" content="https://bucagdas.github.io/web-serial-terminal/">
     <meta property="twitter:title" content="Web Serial Terminal">
     <meta property="twitter:description" content="Connect to serial devices directly from your browser with this modern, feature-rich terminal interface">
     <meta property="twitter:image" content="icons/icon-512x512.png">
@@ -58,7 +58,7 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "Web Serial Terminal",
-      "url": "https://sarusadgac.github.io/web-serial-terminal/",
+      "url": "https://bucagdas.github.io/web-serial-terminal/",
       "description": "A modern, customizable web-based terminal interface that lets you connect to and communicate with serial port devices directly from your browser.",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Any",
@@ -69,8 +69,8 @@
       },
       "author": {
         "@type": "Person",
-        "name": "sarusadgac",
-        "url": "https://github.com/sarusadgac"
+        "name": "bucagdas",
+        "url": "https://github.com/bucagdas"
       },
       "keywords": "web serial api, serial terminal, browser terminal, serial port, serial communication",
       "license": "https://opensource.org/licenses/MIT"
@@ -410,9 +410,9 @@
             </div>
             
             <div class="terminal-content-area">
-                <div id="terminal" class="terminal"></div>
+                <div id="terminal" class="terminal" role="log" aria-live="polite" aria-relevant="additions" tabindex="0" aria-label="Terminal Output"></div>
                 <div id="traditionalTerminal" class="terminal traditional-terminal hidden">
-                    <div class="terminal-output"></div>
+                    <div class="terminal-output" role="log" aria-live="polite" aria-relevant="additions" tabindex="0" aria-label="Traditional Terminal Output"></div>
                     <div class="terminal-input-line">
                         <span class="terminal-prompt">user@webserial:~$</span>
                         <span class="terminal-input-area" contenteditable="true" spellcheck="false"></span>
@@ -433,7 +433,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <span class="footer-app-name">Web Serial Terminal</span>
-                    <span class="footer-copyright">&copy; 2025</span>
+                    <span class="footer-copyright">&copy; 2026</span>
                 </div>
                 <div class="footer-divider"></div>
                 <div class="footer-section">
@@ -447,13 +447,13 @@
                 </div>
                 <div class="footer-divider"></div>
                 <div class="footer-section">
-                    <span>By <a href="https://github.com/sarusadgac" target="_blank" rel="noopener noreferrer">sarusadgac</a></span>
-                    <a href="https://github.com/sarusadgac/web-serial-terminal" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+                    <span>By <a href="https://github.com/bucagdas" target="_blank" rel="noopener noreferrer">bucagdas</a></span>
+                    <a href="https://github.com/bucagdas/web-serial-terminal" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
                 </div>
             </div>
         </footer>
     </div>
     
-    <script src="script.js"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html> 

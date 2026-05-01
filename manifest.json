@@ -2,7 +2,7 @@
   "name": "Web Serial Terminal",
   "short_name": "Web Serial Terminal",
   "description": "Terminal Application working with Web Serial API",
-  "author": "sarusadgac",
+  "author": "bucagdas",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f5f7fa",

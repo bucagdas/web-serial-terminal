@@ -1,0 +1,32 @@
+        button.addEventListener('click', async () => {
+        clearButton.addEventListener('click', () => {
+        connectButton.addEventListener('click', async () => {
+        input.addEventListener('keydown', (e) => {
+        sendButton.addEventListener('click', () => {
+        terminalInputArea.addEventListener(evt, () => {
+    commandsToggle?.addEventListener('click', () => {
+    document.getElementById('applyFilter').addEventListener('click', applyTerminalFilter);
+    document.getElementById('closeExport').addEventListener('click', () => togglePanel(exportPanel, exportToggle));
+    document.getElementById('closeFilter').addEventListener('click', () => togglePanel(filterPanel, filterToggle));
+    document.getElementById('closeSearch').addEventListener('click', () => togglePanel(searchPanel, searchToggle));
+    document.getElementById('closeStats').addEventListener('click', () => togglePanel(statsPanel, statsToggle));
+    document.getElementById('exportTxt').addEventListener('click', () => exportTerminalContent('txt'));
+    document.getElementById('resetFilter').addEventListener('click', resetTerminalFilter);
+    document.getElementById('resetStats').addEventListener('click', resetStatistics);
+    document.getElementById('searchNext').addEventListener('click', () => navigateSearch('next'));
+    document.getElementById('searchPrev').addEventListener('click', () => navigateSearch('prev'));
+    exportToggle.addEventListener('click', () => togglePanel(exportPanel, exportToggle));
+    filterToggle.addEventListener('click', () => togglePanel(filterPanel, filterToggle));
+    navigator.serial.addEventListener('disconnect', async (event) => {
+    searchInput.addEventListener('input', () => { setTimeout(performSearch, 300); });
+    searchToggle.addEventListener('click', () => togglePanel(searchPanel, searchToggle));
+    settingsToggle?.addEventListener('click', () => {
+    statsToggle.addEventListener('click', () => {
+    terminalInputArea.addEventListener('blur', () => terminalCursor.style.display = 'none');
+    terminalInputArea.addEventListener('keydown', async (event) => {
+    terminalModeToggle.addEventListener('click', () => {
+    themeToggle.addEventListener('click', () => {
+    traditionalTerminal.addEventListener('click', () => terminalInputArea.focus());
+    window.addEventListener('load', () => {
+    window.addEventListener('resize', () => {
+document.addEventListener('DOMContentLoaded', () => {

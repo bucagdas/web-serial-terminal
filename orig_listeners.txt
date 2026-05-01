@@ -1,0 +1,48 @@
+        document.addEventListener('keydown', e => {
+        document.querySelector('.terminal-container').addEventListener('contextmenu', e => {
+    button.addEventListener('click', () => {
+    button.addEventListener('click', () => {
+    document.addEventListener('DOMContentLoaded', applyProtection);
+    toggle.addEventListener('click', () => {
+applyFilter.addEventListener('click', applyTerminalFilter);
+autoScrollToggle.addEventListener('click', () => {
+clearButton.addEventListener('click', clearTerminal);
+closeExport.addEventListener('click', () => {
+closeFilter.addEventListener('click', () => {
+closeSearch.addEventListener('click', () => {
+closeStats.addEventListener('click', () => {
+commandsToggle.addEventListener('click', () => {
+connectButton.addEventListener('click', toggleConnection);
+controlClose.addEventListener('click', () => {
+controlMaximize.addEventListener('click', toggleMaximize);
+controlMinimize.addEventListener('click', () => {
+document.addEventListener('DOMContentLoaded', () => {
+exportToggle.addEventListener('click', () => {
+exportTxt.addEventListener('click', () => {
+filterToggle.addEventListener('click', () => {
+input.addEventListener('keydown', function(event) {
+navigator.serial.addEventListener('connect', (event) => {
+navigator.serial.addEventListener('disconnect', (event) => {
+resetFilter.addEventListener('click', resetTerminalFilter);
+resetStats.addEventListener('click', resetStatistics);
+searchInput.addEventListener('input', performSearch);
+searchInput.addEventListener('keydown', (event) => {
+searchNext.addEventListener('click', () => navigateSearch('next'));
+searchPrev.addEventListener('click', () => navigateSearch('prev'));
+searchToggle.addEventListener('click', () => {
+sendButton.addEventListener('click', sendData);
+settingsToggle.addEventListener('click', () => {
+statsToggle.addEventListener('click', () => {
+terminalContentArea.addEventListener('scroll', function() {
+terminalFontSize.addEventListener('change', updateTerminalSize);
+terminalHeight.addEventListener('change', updateTerminalSize);
+terminalInputArea.addEventListener('blur', function() {
+terminalInputArea.addEventListener('click', updateCursorPosition);
+terminalInputArea.addEventListener('focus', function() {
+terminalInputArea.addEventListener('input', updateCursorPosition);
+terminalInputArea.addEventListener('keydown', function(event) {
+terminalInputArea.addEventListener('keyup', updateCursorPosition);
+terminalModeToggle.addEventListener('click', toggleTerminalMode);
+themeToggle.addEventListener('click', toggleTheme);
+traditionalTerminal.addEventListener('click', function() {
+window.addEventListener('resize', updateCursorPosition);
