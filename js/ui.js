@@ -1,3 +1,5 @@
+import { clearTerminal } from './terminal.js';
+
 export function setupThemeToggle() {
     const themeToggle = document.getElementById('themeToggle');
     let currentTheme = localStorage.getItem('theme') || 'light';
@@ -82,8 +84,9 @@ function setupTerminalWindowButtons() {
     const terminalContainer = document.querySelector('.terminal-container');
 
     document.querySelector('.control-close')?.addEventListener('click', () => {
-        const terminal = document.getElementById('terminal');
-        if (terminal) terminal.innerHTML = '';
+        // Use clearTerminal() so the modern terminal's pending render buffer is
+        // reset too — clearing innerHTML alone lets a buffered rAF flush reappear.
+        clearTerminal();
         const traditionalOutput = document.querySelector('.traditional-terminal .terminal-output');
         if (traditionalOutput) traditionalOutput.innerHTML = '';
     });

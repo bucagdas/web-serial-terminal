@@ -618,8 +618,9 @@ label input[type="checkbox"] {
     transition: opacity 0.15s ease;
 }
 
-/* Reveal the glyphs on hover, like macOS */
-.terminal-window-controls:hover .traffic-light i {
+/* Reveal the glyphs on hover, like macOS — and on keyboard focus for a11y */
+.terminal-window-controls:hover .traffic-light i,
+.terminal-window-controls:focus-within .traffic-light i {
     opacity: 1;
 }
 

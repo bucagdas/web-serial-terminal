@@ -1,4 +1,4 @@
-const CACHE_NAME = 'web-serial-terminal-v5';
+const CACHE_NAME = 'web-serial-terminal-v6';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
