@@ -8,6 +8,12 @@ export let outputStream = null;
 export let isConnected = false;
 let uiDisconnectCallback = null;
 
+// References to the pipeTo() promises so they can be awaited during teardown.
+// Without this, port.close() can throw because the streams are still locked,
+// and the pipe promises reject unhandled.
+let readableStreamClosed = null;
+let writableStreamClosed = null;
+
 export function setDisconnectCallback(cb) {
     uiDisconnectCallback = cb;
 }
@@ -29,12 +35,12 @@ export async function connect(options) {
         await port.open(options);
         
         const decoder = new TextDecoderStream();
-        port.readable.pipeTo(decoder.writable);
+        readableStreamClosed = port.readable.pipeTo(decoder.writable).catch(() => {});
         inputStream = decoder.readable;
         reader = inputStream.getReader();
-        
+
         const encoder = new TextEncoderStream();
-        encoder.readable.pipeTo(port.writable);
+        writableStreamClosed = encoder.readable.pipeTo(port.writable).catch(() => {});
         outputStream = encoder.writable;
         
         isConnected = true;
@@ -58,13 +64,19 @@ export async function disconnect() {
 }
 
 async function forceDisconnect() {
+    // Stop the read side first, then wait for its pipe to settle so
+    // port.readable becomes unlocked before we close the port.
     if (reader) {
         try { await reader.cancel(); } catch(e) { console.warn(e); }
+        try { await readableStreamClosed; } catch(e) { /* already caught */ }
         reader = null;
+        readableStreamClosed = null;
     }
     if (outputStream) {
-        try { await outputStream.getWriter().close(); } catch(e) { console.warn(e); }
+        try { await outputStream.close(); } catch(e) { console.warn(e); }
+        try { await writableStreamClosed; } catch(e) { /* already caught */ }
         outputStream = null;
+        writableStreamClosed = null;
     }
     if (port) {
         try { await port.close(); } catch(e) { console.warn(e); }

@@ -1,6 +1,6 @@
-import { terminal, terminalContentArea, setAutoScroll, scrollToBottom, traditionalTerminal, logToTerminal, formatOutputText } from './terminal.js';
+import { terminal, terminalContentArea, setAutoScroll, scrollToBottom, distanceFromBottom, consumeProgrammaticScroll, traditionalTerminal, logToTerminal, formatOutputText } from './terminal.js';
 import { isConnected, sendData as sendSerialDataText, outputStream } from './serial.js';
-import { escapeHtml } from './utils.js';
+import { escapeHtml, escapeRegExp, formatBytes, getTimestamp } from './utils.js';
 
 // --- DOM Elements ---
 const terminalModeToggle = document.getElementById('terminalModeToggle');
@@ -180,13 +180,6 @@ function updateStatsDisplay() {
     }
 }
 
-function formatBytes(bytes) {
-    if (bytes === 0) return '0 B';
-    const units = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
-}
-
 // --- Search ---
 let isSearchActive = false;
 let searchMatches = [];
@@ -202,41 +195,75 @@ function setupSearch() {
 export function performSearch() {
     const searchInput = document.getElementById('searchInput');
     const searchInfo = document.getElementById('searchInfo');
-    
+
     clearSearchHighlights();
-    
+
     const searchTerm = searchInput.value.trim();
     if (!searchTerm) {
         searchInfo.textContent = '0 matches';
         isSearchActive = false;
         return;
     }
-    
+
     isSearchActive = true;
     searchMatches = [];
     currentMatchIndex = -1;
-    
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = terminal.innerHTML;
-    
+
+    let regex;
     try {
-        const regex = new RegExp(escapeRegExp(searchTerm), 'gi');
-        const terminalText = tempDiv.innerHTML;
-        
-        const markedContent = terminalText.replace(regex, match => 
-            `<span class="search-highlight">${match}</span>`
-        );
-        
-        terminal.innerHTML = markedContent;
-        searchMatches = Array.from(terminal.querySelectorAll('.search-highlight'));
-        searchInfo.textContent = `${searchMatches.length} matches`;
-        
-        if (searchMatches.length > 0) {
-            navigateSearch('next');
-        }
+        regex = new RegExp(escapeRegExp(searchTerm), 'gi');
     } catch (e) {
         console.error('Search error:', e);
         searchInfo.textContent = 'Invalid search';
+        return;
+    }
+
+    // Walk only text nodes so we never touch element tags/attributes.
+    // Highlights are inserted by splitting the matched text nodes in place,
+    // which keeps the surrounding markup intact.
+    const walker = document.createTreeWalker(terminal, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+            if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+            // Don't descend into existing highlight spans.
+            if (node.parentElement?.classList.contains('search-highlight')) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+        }
+    });
+
+    const textNodes = [];
+    let current;
+    while ((current = walker.nextNode())) textNodes.push(current);
+
+    textNodes.forEach(textNode => {
+        const text = textNode.nodeValue;
+        regex.lastIndex = 0;
+        if (!regex.test(text)) return;
+
+        regex.lastIndex = 0;
+        const fragment = document.createDocumentFragment();
+        let lastIndex = 0;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+                fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            }
+            const mark = document.createElement('span');
+            mark.className = 'search-highlight';
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            lastIndex = match.index + match[0].length;
+            searchMatches.push(mark);
+            if (match[0].length === 0) regex.lastIndex++; // guard against zero-width matches
+        }
+        if (lastIndex < text.length) {
+            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+        }
+        textNode.parentNode.replaceChild(fragment, textNode);
+    });
+
+    searchInfo.textContent = `${searchMatches.length} matches`;
+    if (searchMatches.length > 0) {
+        navigateSearch('next');
     }
 }
 
@@ -273,10 +300,6 @@ function clearSearchHighlights() {
         parent.replaceChild(document.createTextNode(el.textContent), el);
         parent.normalize();
     });
-}
-
-function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
 // --- Filter ---
@@ -378,11 +401,6 @@ function exportTerminalContent(format) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-}
-
-function getTimestamp() {
-    const now = new Date();
-    return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
 }
 
 function extractTextFromTerminal(container) {
@@ -509,15 +527,16 @@ export function setupUIExtras() {
         localStorage.setItem('autoScroll', active);
     });
 
+    // A single forgiving threshold (no dead zone): auto-scroll follows whether
+    // the user is near the bottom. Programmatic scrolls from scrollToBottom are
+    // ignored so a live stream never disables itself.
+    const STICK_THRESHOLD = 40;
     terminalContentArea.addEventListener('scroll', () => {
-        if (terminalContentArea.scrollHeight - terminalContentArea.scrollTop > terminalContentArea.clientHeight + 30) {
-            setAutoScroll(false);
-            autoScrollToggle?.classList.add('disabled');
-        } else if (terminalContentArea.scrollHeight - terminalContentArea.scrollTop <= terminalContentArea.clientHeight + 10) {
-            setAutoScroll(true);
-            autoScrollToggle?.classList.remove('disabled');
-            localStorage.setItem('autoScroll', true);
-        }
+        if (consumeProgrammaticScroll()) return;
+        const nearBottom = distanceFromBottom() <= STICK_THRESHOLD;
+        setAutoScroll(nearBottom);
+        autoScrollToggle?.classList.toggle('disabled', !nearBottom);
+        localStorage.setItem('autoScroll', nearBottom);
     });
 
     // Terminal Settings
@@ -541,11 +560,13 @@ export function setupUIExtras() {
     if (localStorage.getItem('terminalFontSize')) {
         if(terminalFontSize) terminalFontSize.value = localStorage.getItem('terminalFontSize');
     }
-    if (localStorage.getItem('autoScroll') === 'false') {
-        setAutoScroll(false);
-        autoScrollToggle?.classList.add('disabled');
-    }
-    
+    // Always start a fresh session with auto-scroll ON. It is a transient view
+    // state, not a preference — persisting "off" across reloads used to trap
+    // users with a terminal that never followed new data. The live scroll
+    // position and the toggle button still control it during the session.
+    setAutoScroll(true);
+    autoScrollToggle?.classList.remove('disabled');
+
     updateSize();
 }
 

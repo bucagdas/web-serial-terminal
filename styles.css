@@ -357,15 +357,45 @@ button:disabled {
     box-shadow: none;
 }
 
+/* Keyboard focus rings (accessible, but not shown for mouse clicks) */
+button:focus-visible,
+.control-btn:focus-visible,
+.traffic-light:focus-visible,
+.tab:focus-visible,
+select:focus-visible,
+input:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
 .command-button {
-    background: var(--secondary-gradient);
-    font-size: 0.9rem;
-    padding: 8px 12px;
-    margin: 4px;
+    background: var(--tab-inactive-bg);
+    color: var(--text-color);
+    border: 1px solid var(--panel-border);
+    box-shadow: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 8px 14px;
+    margin: 0;
 }
 
 .command-button:hover {
-    background: var(--secondary-hover);
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+.command-button:active {
+    transform: translateY(0);
+    filter: brightness(0.95);
+}
+
+.command-button:disabled {
+    background: var(--tab-inactive-bg);
+    color: var(--text-color);
+    border-color: var(--panel-border);
+    opacity: 0.45;
 }
 
 /* ===== CONNECTION CONTROLS ===== */
@@ -479,6 +509,12 @@ label input[type="checkbox"] {
     white-space: pre-wrap;
     word-break: break-word;
     min-height: 100%;
+    /* Cancel the fixed height + overflow inherited from the .terminal class so
+       the ONLY scroll container is .terminal-content-area. Two nested scrollers
+       produced a second scrollbar and broke auto-scroll (scrollToBottom moved
+       the outer area while content actually scrolled inside #terminal). */
+    height: auto;
+    overflow: visible;
 }
 
 /* Terminal scrollbar styling */
@@ -538,19 +574,68 @@ label input[type="checkbox"] {
 
 /* Terminal header */
 .terminal-header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: 0 10px;
-    height: 32px;
-    background: rgba(0, 0, 0, 0.2);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0 12px;
+    height: 38px;
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     font-family: 'Inter', sans-serif;
     font-size: 12px;
     color: rgba(255, 255, 255, 0.7);
     user-select: none;
     z-index: 10;
 }
+
+/* macOS-style traffic-light window controls (left zone) */
+.terminal-window-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-self: start;
+}
+
+.traffic-light {
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+    transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.traffic-light i {
+    font-size: 7px;
+    line-height: 1;
+    color: rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+/* Reveal the glyphs on hover, like macOS */
+.terminal-window-controls:hover .traffic-light i {
+    opacity: 1;
+}
+
+.traffic-light:hover {
+    filter: brightness(0.92);
+    transform: none;
+    box-shadow: none;
+}
+
+.traffic-light:active {
+    transform: scale(0.9);
+}
+
+.control-close    { background: #ff5f57; }
+.control-minimize { background: #febc2e; }
+.control-maximize { background: #28c840; }
 
 /* Terminal panels container */
 .terminal-panels {
@@ -589,30 +674,30 @@ label input[type="checkbox"] {
 
 .terminal-title {
     font-weight: 500;
+    justify-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
 }
 
+.terminal-title i {
+    opacity: 0.75;
+}
+
+/* Feature tools (right zone) */
 .terminal-controls {
     display: flex;
-    gap: 4px;
+    align-items: center;
+    gap: 2px;
+    justify-self: end;
 }
 
-.terminal-control {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.control-close {
-    background-color: #ef4444;
-}
-
-.control-minimize {
-    background-color: #f59e0b;
-}
-
-.control-maximize {
-    background-color: #10b981;
+.terminal-controls-divider {
+    width: 1px;
+    height: 16px;
+    margin: 0 6px;
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .terminal {
@@ -660,7 +745,7 @@ label input[type="checkbox"] {
 }
 
 .input-area button {
-    background: var(--secondary-gradient);
+    background: var(--primary-gradient);
 }
 
 /* ===== WARNING STYLES ===== */
@@ -932,25 +1017,54 @@ body.error-page {
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
     .connection-controls {
-        flex-direction: column;
-        align-items: stretch;
+        gap: 12px;
     }
-    
+
+    /* Two-column grid for the setting dropdowns instead of one tall stack */
     .settings-group {
-        width: 100%;
+        flex: 1 1 calc(50% - 6px);
+        min-width: 0;
+        margin-bottom: 0;
     }
-    
+
+    /* Primary connect action and status span the full width */
+    #connectButton,
+    .connection-status {
+        flex: 1 1 100%;
+        justify-content: center;
+    }
+
     .tab {
         padding: 8px 12px;
         font-size: 0.875rem;
     }
-    
+
+    /* Two-column grid of command chips instead of a long single column */
+    .common-commands {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
     .command-button {
         width: 100%;
     }
-    
-    .terminal {
-        height: 350px;
+
+    /* Keep the terminal toolbar from overflowing on narrow screens */
+    .terminal-controls-divider {
+        display: none;
+    }
+
+    .control-btn {
+        width: 26px;
+        height: 26px;
+    }
+}
+
+/* Very small screens: single column of command chips */
+@media (max-width: 380px) {
+    .common-commands {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -958,21 +1072,23 @@ body.error-page {
 .control-btn {
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.65);
     cursor: pointer;
-    width: 24px;
-    height: 24px;
-    margin-left: 5px;
-    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    box-shadow: none;
+    transition: all 0.15s ease;
 }
 
 .control-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.95);
+    transform: none;
+    box-shadow: none;
 }
 
 .control-btn.active {

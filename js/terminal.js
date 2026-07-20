@@ -8,6 +8,11 @@ export const terminalPrompt = document.querySelector('.traditional-terminal .ter
 
 export let autoScroll = true;
 
+// True while we are programmatically scrolling to the bottom, so the scroll
+// listener can tell our own scroll apart from a real user scroll and not
+// mistakenly disable auto-scroll during a live data stream.
+let programmaticScroll = false;
+
 // Buffer State
 let renderBuffer = '';
 let renderTimer = null;
@@ -21,7 +26,7 @@ export function setTerminalUpdateCallback(cb) {
 
 // Configs for DOM Limit
 const MAX_TRADITIONAL_LINES = 1000;
-const MAX_MODERN_CHARS = 200000;
+const MAX_MODERN_NODES = 5000;
 
 export function setAutoScroll(value) {
     autoScroll = value;
@@ -75,10 +80,10 @@ function flushTraditionalTerminal() {
 }
 
 function limitTerminalSize() {
-    if (terminal.innerHTML.length > MAX_MODERN_CHARS) {
-        const newContent = terminal.innerHTML.slice(-(MAX_MODERN_CHARS / 2));
-        const safeIndex = newContent.indexOf('<span');
-        terminal.innerHTML = safeIndex !== -1 ? newContent.slice(safeIndex) : newContent;
+    // Trim whole child nodes from the front so we never slice through a tag or
+    // HTML entity (which the old character-based slice could do).
+    while (terminal.childNodes.length > MAX_MODERN_NODES) {
+        terminal.removeChild(terminal.firstChild);
     }
 }
 
@@ -91,9 +96,29 @@ export function updateTraditionalPrompt(isConnected) {
 }
 
 export function scrollToBottom() {
-    if (autoScroll) {
-        terminalContentArea.scrollTop = terminalContentArea.scrollHeight;
+    if (!autoScroll) return;
+    const max = terminalContentArea.scrollHeight - terminalContentArea.clientHeight;
+    // Already at the bottom: setting scrollTop won't fire a scroll event, so
+    // don't arm the guard (it would swallow the user's next real scroll).
+    if (terminalContentArea.scrollTop >= max - 1) return;
+    programmaticScroll = true;
+    terminalContentArea.scrollTop = max;
+}
+
+// Distance in pixels between the current scroll position and the bottom.
+export function distanceFromBottom() {
+    return terminalContentArea.scrollHeight - terminalContentArea.scrollTop - terminalContentArea.clientHeight;
+}
+
+// Returns true (and clears the flag) if the pending scroll event was caused by
+// our own scrollToBottom() rather than the user. The guard is only armed when
+// scrollToBottom actually moves the position, so exactly one event consumes it.
+export function consumeProgrammaticScroll() {
+    if (programmaticScroll) {
+        programmaticScroll = false;
+        return true;
     }
+    return false;
 }
 
 export function formatOutputText(text) {

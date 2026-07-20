@@ -1,6 +1,7 @@
 import { connect, disconnect, isConnected, sendData, setDisconnectCallback } from './serial.js';
 import { setupUI, updateConnectionStatusUI } from './ui.js';
-import { logToTerminal, appendToTraditionalTerminal, updateTraditionalPrompt, setTerminalUpdateCallback } from './terminal.js';
+import { logToTerminal, appendToTraditionalTerminal, updateTraditionalPrompt, setTerminalUpdateCallback, clearTerminal } from './terminal.js';
+import { escapeHtml } from './utils.js';
 import { setupFeatures, trackBytesSent, isFilterActive, applyTerminalFilter, performSearch } from './features.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -44,10 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 await disconnect();
             } else {
                 const options = {
-                    baudRate: parseInt(document.getElementById('baudRate').value || 9600),
-                    dataBits: parseInt(document.getElementById('dataBits').value || 8),
-                    stopBits: parseInt(document.getElementById('stopBits')?.value || 1),
+                    baudRate: parseInt(document.getElementById('baudRate').value || 9600, 10),
+                    dataBits: parseInt(document.getElementById('dataBits').value || 8, 10),
+                    stopBits: parseInt(document.getElementById('stopBits')?.value || 1, 10),
                     parity: document.getElementById('parity').value || 'none',
+                    flowControl: document.getElementById('flowControl')?.value || 'none',
                 };
                 await connect(options);
             }
@@ -55,33 +57,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if(sendButton && input) {
-        sendButton.addEventListener('click', () => {
-            let dataToSend = input.value;
-            if (document.getElementById('addCR').checked) dataToSend += '\r';
-            if (document.getElementById('addLF').checked) dataToSend += '\n';
-            
-            trackBytesSent(dataToSend.length);
-            sendData(dataToSend);
-            input.value = '';
-        });
+    function sendFromInput() {
+        const rawCommand = input.value;
+        if (!rawCommand) return;
 
+        let dataToSend = rawCommand;
+        if (document.getElementById('addCR').checked) dataToSend += '\r';
+        if (document.getElementById('addLF').checked) dataToSend += '\n';
+
+        // Local echo: show the typed command in the terminal before sending.
+        if (document.getElementById('echoOn')?.checked) {
+            logToTerminal(`<span class="command">${escapeHtml(rawCommand)}</span>\n`);
+            appendToTraditionalTerminal(`<span class="command">${escapeHtml(rawCommand)}</span>`);
+        }
+
+        trackBytesSent(dataToSend.length);
+        sendData(dataToSend);
+        input.value = '';
+    }
+
+    if(sendButton && input) {
+        sendButton.addEventListener('click', sendFromInput);
         input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                let dataToSend = input.value;
-                if (document.getElementById('addCR').checked) dataToSend += '\r';
-                if (document.getElementById('addLF').checked) dataToSend += '\n';
-                
-                trackBytesSent(dataToSend.length);
-                sendData(dataToSend);
-                input.value = '';
-            }
+            if (e.key === 'Enter') sendFromInput();
         });
     }
 
     if(clearButton) {
         clearButton.addEventListener('click', () => {
-            if(terminal) logToTerminal("");
+            if(terminal) clearTerminal();
             const terminalOutput = document.querySelector('.traditional-terminal .terminal-output');
             if(terminalOutput) terminalOutput.innerHTML = '';
         });
@@ -96,27 +100,3 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.log('ServiceWorker registration failed: ', err));
     });
 }
-function applyProtection() {
-    const terminalContainer = document.querySelector('.terminal-container');
-    if(terminalContainer) {
-        terminalContainer.addEventListener('contextmenu', e => {
-            e.preventDefault();
-            return false;
-        });
-        
-        const watermark = document.createElement('div');
-        watermark.style.position = 'absolute';
-        watermark.style.bottom = '10px';
-        watermark.style.right = '10px';
-        watermark.style.opacity = '0.1';
-        watermark.style.pointerEvents = 'none';
-        watermark.style.fontSize = '12px';
-        watermark.style.fontWeight = 'bold';
-        watermark.style.zIndex = '100';
-        watermark.textContent = 'Web Serial Terminal';
-        
-        terminalContainer.style.position = 'relative';
-        terminalContainer.appendChild(watermark);
-    }
-}
-document.addEventListener('DOMContentLoaded', applyProtection);
