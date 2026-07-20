@@ -277,6 +277,17 @@
         
         <div class="terminal-container">
             <div class="terminal-header">
+                <div class="terminal-window-controls" aria-label="Window controls">
+                    <button class="traffic-light control-close" title="Clear Terminal" aria-label="Clear terminal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <button class="traffic-light control-minimize" title="Minimize Terminal" aria-label="Minimize terminal">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button class="traffic-light control-maximize" title="Maximize Terminal" aria-label="Maximize terminal">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
                 <div class="terminal-title">
                     <i class="fas fa-terminal"></i> Serial Connection
                 </div>
@@ -296,15 +307,7 @@
                     <button class="control-btn" id="filterToggle" title="Filter terminal output">
                         <i class="fas fa-filter"></i>
                     </button>
-                    <button class="control-btn control-close" title="Clear Terminal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <button class="control-btn control-minimize" title="Minimize Terminal">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                    <button class="control-btn control-maximize" title="Maximize Terminal">
-                        <i class="fas fa-expand"></i>
-                    </button>
+                    <span class="terminal-controls-divider" aria-hidden="true"></span>
                     <button class="control-btn auto-scroll-toggle" id="autoScrollToggle" title="Toggle Auto-scroll">
                         <i class="fas fa-angle-double-down"></i>
                     </button>

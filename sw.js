@@ -1,4 +1,4 @@
-const CACHE_NAME = 'web-serial-terminal-v1';
+const CACHE_NAME = 'web-serial-terminal-v5';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -7,6 +7,7 @@ const ASSETS_TO_CACHE = [
     './js/ui.js',
     './js/serial.js',
     './js/terminal.js',
+    './js/features.js',
     './js/utils.js',
     './manifest.json'
 ];

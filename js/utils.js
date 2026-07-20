@@ -1,10 +1,5 @@
 // Utility functions for Web Serial Terminal
 
-export function generateUniqueId() {
-    return 'st-' + Math.random().toString(36).substring(2, 15) + 
-           Math.random().toString(36).substring(2, 15);
-}
-
 export function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
