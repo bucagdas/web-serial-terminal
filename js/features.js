@@ -561,7 +561,7 @@ export function setupUIExtras() {
         if(terminalFontSize) terminalFontSize.value = localStorage.getItem('terminalFontSize');
     }
     // Always start a fresh session with auto-scroll ON. It is a transient view
-    // state, not a preference — persisting "off" across reloads used to trap
+    // state, not a preference: persisting "off" across reloads used to trap
     // users with a terminal that never followed new data. The live scroll
     // position and the toggle button still control it during the session.
     setAutoScroll(true);

@@ -618,7 +618,7 @@ label input[type="checkbox"] {
     transition: opacity 0.15s ease;
 }
 
-/* Reveal the glyphs on hover, like macOS — and on keyboard focus for a11y */
+/* Reveal the glyphs on hover, like macOS, and on keyboard focus for a11y */
 .terminal-window-controls:hover .traffic-light i,
 .terminal-window-controls:focus-within .traffic-light i {
     opacity: 1;
@@ -1070,6 +1070,10 @@ body.legal-page {
 .legal-container a {
     color: var(--primary-color);
     font-weight: 500;
+}
+
+.legal-container a.button-link {
+    color: white;
 }
 
 .legal-container code {

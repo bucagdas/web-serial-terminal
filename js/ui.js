@@ -85,7 +85,7 @@ function setupTerminalWindowButtons() {
 
     document.querySelector('.control-close')?.addEventListener('click', () => {
         // Use clearTerminal() so the modern terminal's pending render buffer is
-        // reset too — clearing innerHTML alone lets a buffered rAF flush reappear.
+        // reset too: clearing innerHTML alone lets a buffered rAF flush reappear.
         clearTerminal();
         const traditionalOutput = document.querySelector('.traditional-terminal .terminal-output');
         if (traditionalOutput) traditionalOutput.innerHTML = '';
