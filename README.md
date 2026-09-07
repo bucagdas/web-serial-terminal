@@ -88,6 +88,12 @@ You can use any static hosting service like Netlify, Vercel, Firebase Hosting, G
 - Port access cannot be requested without explicit user interaction (e.g., clicking the connect button).
 - The user must grant permission for each newly connected device.
 
+## Privacy
+
+This app is fully client-side and serverless — there is no backend, so serial data received from or sent to a connected device never leaves your browser. A few preferences (theme, terminal mode, macros) are saved locally via `localStorage` on your own device only.
+
+The live demo does load Google AdSense to display ads, which may use cookies for ad personalization; see [`privacy.html`](privacy.html) for details.
+
 ## License
 
 [MIT License](LICENSE)
